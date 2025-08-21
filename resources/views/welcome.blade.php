@@ -63,7 +63,8 @@
     <section class="hero">
         <h1>Bienvenido a Timely</h1>
         <p>¡Gracias por usar nuestro sistema! Aquí podrás gestionar tus actividades de manera eficiente y organizada.</p>
-        <a href="{{ url('/contacto') }}" class="btn">Sobre Nosotros</a>
+        <a href="{{ url('/contacto') }}" class="btn">Sobre Nosotros</a> <br> <br>
+         <a href="{{ url('/spaces') }}" class="btn">Módulo de horarios</a>
     </section>
     
     <footer>
