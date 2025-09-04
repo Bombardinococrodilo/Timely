@@ -64,7 +64,8 @@
         <h1>Bienvenido a Timely</h1>
         <p>¡Gracias por usar nuestro sistema! Aquí podrás gestionar tus actividades de manera eficiente y organizada.</p>
         <a href="{{ url('/contacto') }}" class="btn">Sobre Nosotros</a> <br> <br>
-         <a href="{{ url('/spaces') }}" class="btn">Módulo de espacios</a>
+        <a href="{{ url('/spaces') }}" class="btn">Módulo de espacios</a>
+        <a href="{{ url('/profesores') }}" class="btn">Módulo de profesores</a>
     </section>
     
     <footer>
