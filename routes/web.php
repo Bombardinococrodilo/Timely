@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SpaceController;
+use App\Http\Controllers\EspaciosController;
 use App\Http\Controllers\ProfesorController;
 
 Route::get('/', function () {
@@ -13,5 +13,5 @@ Route::get('/contacto', function () {
 Route::get('/prueba', function () {
     return 'Hola, esta es una ruta de prueba en TIMELY';
 });
-Route::resource('spaces', SpaceController::class);
+Route::resource('espacios', EspaciosController::class);
 Route::resource('profesores', ProfesorController::class);
