@@ -66,6 +66,7 @@
         <a href="{{ url('/contacto') }}" class="btn">Sobre Nosotros</a> <br> <br>
         <a href="{{ url('/espacios') }}" class="btn">Módulo de espacios</a>
         <a href="{{ url('/profesores') }}" class="btn">Módulo de profesores</a>
+        <a href="{{ url('/asignaturas') }}" class="btn">Módulo de asignaturas</a>
     </section>
     
     <footer>
