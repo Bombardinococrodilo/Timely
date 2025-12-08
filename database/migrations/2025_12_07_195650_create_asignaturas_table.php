@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('asignaturas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->string('nombre'); 
             $table->string('descripcion');
             $table->string('profesor_asignado');
             $table->string('horas_semanales');

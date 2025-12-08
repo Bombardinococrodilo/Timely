@@ -1,76 +1,101 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenido a Timely</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fdf9; 
-            color: #2c3e50;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 80px 20px;
-            background: linear-gradient(135deg, #2ecc71, #27ae60); 
-            color: white;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.2);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: white;
-            color: #27ae60;
-            font-weight: bold;
-            border-radius: 30px;
-            text-decoration: none;
-            transition: 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .btn:hover {
-            background-color: #27ae60;
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
-        }
-
-        footer {
-            text-align: center;
-            padding: 15px;
-            background-color: #2ecc71;
-            color: white;
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
-<body>
-    <section class="hero">
-        <h1>Bienvenido a Timely</h1>
-        <p>¡Gracias por usar nuestro sistema! Aquí podrás gestionar tus actividades de manera eficiente y organizada.</p>
-        <a href="{{ url('/contacto') }}" class="btn">Sobre Nosotros</a> <br> <br>
-        <a href="{{ url('/espacios') }}" class="btn">Módulo de espacios</a>
-        <a href="{{ url('/profesores') }}" class="btn">Módulo de profesores</a>
-        <a href="{{ url('/asignaturas') }}" class="btn">Módulo de asignaturas</a>
-    </section>
+@php
+    // Contamos los registros para las estadísticas
+    // Asegúrate de usar el nombre correcto de tus modelos (singular o plural según como quedaron)
+    $profesoresCount = \App\Models\Profesor::count();
+    $cursosCount = \App\Models\Curso::count();
     
-    <footer>
-        <div>© 2025 Timely. Todos los derechos reservados.</div>
-    </footer>
-</body>
-</html>
+    // Ajusta si tu modelo se llama Asignatura o Asignaturas
+    $asignaturasCount = \App\Models\Asignaturas::count(); 
+    
+    $clasesCount = \App\Models\Horario::count();
+@endphp
+
+@extends('layouts.app')
+
+@section('titulo_pagina', 'Panel de Control Principal')
+
+@section('content')
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card card-stat bg-primary text-white p-3 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Profesores</h5>
+                <h2 class="display-4 fw-bold">{{ $profesoresCount }}</h2>
+                <i class="fas fa-chalkboard-teacher icon-stat"></i>
+                <a href="{{ url('/profesores') }}" class="text-white text-decoration-none small">Ver lista &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card card-stat bg-success text-white p-3 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Cursos Activos</h5>
+                <h2 class="display-4 fw-bold">{{ $cursosCount }}</h2>
+                <i class="fas fa-users icon-stat"></i>
+                <a href="{{ url('/cursos') }}" class="text-white text-decoration-none small">Gestionar &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card card-stat bg-warning text-dark p-3 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Asignaturas</h5>
+                <h2 class="display-4 fw-bold">{{ $asignaturasCount }}</h2>
+                <i class="fas fa-book icon-stat"></i>
+                <a href="{{ url('/asignaturas') }}" class="text-dark text-decoration-none small">Ver detalles &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card card-stat bg-info text-white p-3 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Clases Programadas</h5>
+                <h2 class="display-4 fw-bold">{{ $clasesCount }}</h2>
+                <i class="fas fa-calendar-check icon-stat"></i>
+                {{-- Aquí cambiamos el enlace para que vaya a lo visual primero --}}
+                <a href="{{ route('horarios.grilla') }}" class="text-white text-decoration-none small fw-bold">Ver Calendario &rarr;</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">
+                <i class="fas fa-info-circle text-primary"></i> Estado del Sistema
+            </div>
+            <div class="card-body">
+                <p>Bienvenido al sistema <strong>Timely</strong>. Seleccione una opción del menú lateral para comenzar a gestionar la carga académica.</p>
+                <div class="alert alert-light border">
+                    <strong>💡 Tip:</strong> Recuerda crear primero los Profesores, Espacios y Asignaturas antes de intentar crear un Horario.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <h5 class="text-muted mb-3">Acciones Rápidas</h5>
+                
+                {{-- BOTÓN NUEVO: Ver Grilla de Horarios --}}
+                <a href="{{ route('horarios.grilla') }}" class="btn btn-info text-white w-100 mb-2">
+                    <i class="fas fa-calendar-alt"></i> Ver Calendario General
+                </a>
+
+                <a href="{{ route('horarios.create') }}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-plus-circle"></i> Nueva Clase
+                </a>
+                
+                <a href="{{ url('/profesores/create') }}" class="btn btn-outline-success w-100">
+                    <i class="fas fa-user-plus"></i> Nuevo Profesor
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
