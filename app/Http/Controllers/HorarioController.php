@@ -44,20 +44,19 @@ class HorarioController extends Controller
         ]);
 
         // =========================================================
-        // 🚨 NUEVA VALIDACIÓN: CONTROL DE AFORO (CAPACIDAD)
+        //  NUEVA VALIDACIÓN: CONTROL DE AFORO (CAPACIDAD)
         // =========================================================
         $curso = Curso::find($request->curso_id);
         $espacio = Espacios::find($request->espacio_id);
 
-        // Verificamos si la capacidad del salón es menor que la cantidad de estudiantes
         if ($espacio && $curso && $espacio->capacidad < $curso->cantidad_estudiantes) {
             return back()
                 ->withErrors(['error' => "¡Error de Aforo! El espacio '{$espacio->nombre}' solo tiene capacidad para {$espacio->capacidad} personas, pero el curso tiene {$curso->cantidad_estudiantes} estudiantes."])
                 ->withInput();
         }
+
         // =========================================================
 
-        // Validación de Cruces de Horario (Profesor, Espacio, Curso)
         $cruce = Horario::where('dia', $request->dia)
             ->where(function($query) use ($request) {
                 $query->where('hora_inicio', '<', $request->hora_fin)
@@ -110,7 +109,7 @@ class HorarioController extends Controller
         ]);
 
         // =========================================================
-        // 🚨 NUEVA VALIDACIÓN: CONTROL DE AFORO (EN EDICIÓN TAMBIÉN)
+        //  NUEVA VALIDACIÓN: CONTROL DE AFORO 
         // =========================================================
         $curso = Curso::find($request->curso_id);
         $espacio = Espacios::find($request->espacio_id);
@@ -162,7 +161,7 @@ class HorarioController extends Controller
 
     public function descargarPDF()
     {
-        // Obtenemos los datos igual que en la grilla
+
         $horarios = Horario::with(['profesor', 'curso', 'asignatura', 'espacio'])->get();
         $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00'];
         $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
