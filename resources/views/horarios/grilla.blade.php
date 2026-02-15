@@ -29,14 +29,13 @@
                     <tr>
                         <td class="fw-bold bg-light">{{ $hora }}</td>
                         
-                        @foreach($dias as $dia)
-                            @php
-                                // Buscamos si hay una clase en este Día y a esta Hora (aproximada)
-                                $clase = $horarios->filter(function($h) use ($dia, $hora) {
-                                    // Comparamos si la hora de la fila coincide con el inicio de la clase
-                                    // substr corta "07:00:00" a "07:00"
-                                    return $h->dia == $dia && substr($h->hora_inicio, 0, 5) == $hora;
-                                })->first();
+                       @foreach($dias as $dia)
+                          @php
+                                $clase = $horarios->first(function($h) use ($dia, $hora) {         
+                                $horaDB = substr($h->hora_inicio, 0, 5);
+                                return $h->dia == $dia && $horaDB == $hora;
+                                 });
+
                             @endphp
 
                             <td style="height: 100px; vertical-align: middle;">

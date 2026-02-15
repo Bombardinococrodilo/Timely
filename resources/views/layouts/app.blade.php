@@ -18,7 +18,6 @@
         .card-stat:hover { transform: translateY(-5px); }
         .icon-stat { font-size: 3rem; opacity: 0.3; position: absolute; right: 20px; top: 20px; }
         
-        /* Ajuste para el botón de logout en el sidebar */
         .logout-form button {
             background: none;
             border: none;
@@ -45,6 +44,8 @@
         <a href="{{ url('/cursos') }}" class="{{ request()->is('cursos*') ? 'active' : '' }}"><i class="fas fa-users"></i> Cursos</a>
         <a href="{{ url('/asignaturas') }}" class="{{ request()->is('asignaturas*') ? 'active' : '' }}"><i class="fas fa-book"></i> Asignaturas</a>
         <a href="{{ url('/espacios') }}" class="{{ request()->is('espacios*') ? 'active' : '' }}"><i class="fas fa-building"></i> Espacios</a>
+        <a href="{{ route('notificaciones.index') }}" class="{{ request()->routeIs('notificaciones*') ? 'active' : '' }}">
+        <i class="fas fa-envelope"></i> Notificaciones</a>
         <hr style="border-color: gray;">
         <a href="{{ route('horarios.index') }}" class="{{ request()->is('horarios*') ? 'active' : '' }}"><i class="fas fa-calendar-alt"></i> <b>Gestionar Horarios</b></a>
         
