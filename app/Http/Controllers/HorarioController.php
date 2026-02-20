@@ -12,6 +12,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class HorarioController extends Controller
 {
+    private $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    private $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00'];
+
     public function index()
     {
         $horarios = Horario::with(['profesor', 'curso', 'asignatura', 'espacio'])
@@ -43,42 +46,13 @@ class HorarioController extends Controller
             'hora_fin' => 'required|date_format:H:i|after:hora_inicio', 
         ]);
 
-        // =========================================================
-        //  NUEVA VALIDACIÓN: CONTROL DE AFORO (CAPACIDAD)
-        // =========================================================
-        $curso = Curso::find($request->curso_id);
-        $espacio = Espacios::find($request->espacio_id);
-
-        if ($espacio && $curso && $espacio->capacidad < $curso->cantidad_estudiantes) {
-            return back()
-                ->withErrors(['error' => "¡Error de Aforo! El espacio '{$espacio->nombre}' solo tiene capacidad para {$espacio->capacidad} personas, pero el curso tiene {$curso->cantidad_estudiantes} estudiantes."])
-                ->withInput();
+        
+        if ($errorAforo = $this->validarAforo($request)) {
+            return back()->withErrors(['error' => $errorAforo])->withInput();
         }
 
-        // =========================================================
-
-        $cruce = Horario::where('dia', $request->dia)
-            ->where(function($query) use ($request) {
-                $query->where('hora_inicio', '<', $request->hora_fin)
-                      ->where('hora_fin', '>', $request->hora_inicio);
-            })
-            ->where(function($query) use ($request) {
-                $query->where('profesor_id', $request->profesor_id)  
-                      ->orWhere('espacio_id', $request->espacio_id) 
-                      ->orWhere('curso_id', $request->curso_id);      
-            })
-            ->first(); 
-
-        if ($cruce) {
-            if ($cruce->profesor_id == $request->profesor_id) {
-                return back()->withErrors(['error' => '¡Conflicto! El Profesor ya tiene clase a esa hora.'])->withInput();
-            }
-            if ($cruce->espacio_id == $request->espacio_id) {
-                return back()->withErrors(['error' => '¡Conflicto! El Espacio ya está ocupado a esa hora.'])->withInput();
-            }
-            if ($cruce->curso_id == $request->curso_id) {
-                return back()->withErrors(['error' => '¡Conflicto! El Curso ya tiene otra materia asignada a esa hora.'])->withInput();
-            }
+        if ($errorCruce = $this->validarCruce($request)) {
+            return back()->withErrors(['error' => $errorCruce])->withInput();
         }
 
         Horario::create($request->all());
@@ -108,34 +82,12 @@ class HorarioController extends Controller
             'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
         ]);
 
-        // =========================================================
-        //  NUEVA VALIDACIÓN: CONTROL DE AFORO 
-        // =========================================================
-        $curso = Curso::find($request->curso_id);
-        $espacio = Espacios::find($request->espacio_id);
-
-        if ($espacio && $curso && $espacio->capacidad < $curso->cantidad_estudiantes) {
-            return back()
-                ->withErrors(['error' => "¡Error de Aforo! El espacio '{$espacio->nombre}' solo tiene capacidad para {$espacio->capacidad} personas, pero el curso tiene {$curso->cantidad_estudiantes} estudiantes."])
-                ->withInput();
+        if ($errorAforo = $this->validarAforo($request)) {
+            return back()->withErrors(['error' => $errorAforo])->withInput();
         }
-        // =========================================================
 
-        $cruce = Horario::where('id', '!=', $horario->id) 
-            ->where('dia', $request->dia)
-            ->where(function($query) use ($request) {
-                $query->where('hora_inicio', '<', $request->hora_fin)
-                      ->where('hora_fin', '>', $request->hora_inicio);
-            })
-            ->where(function($query) use ($request) {
-                $query->where('profesor_id', $request->profesor_id)
-                      ->orWhere('espacio_id', $request->espacio_id)
-                      ->orWhere('curso_id', $request->curso_id);
-            })
-            ->first();
-
-        if ($cruce) {
-             return back()->withErrors(['error' => 'No se puede actualizar: Conflicto de horario detectado.'])->withInput();
+        if ($errorCruce = $this->validarCruce($request, $horario->id)) {
+            return back()->withErrors(['error' => $errorCruce])->withInput();
         }
 
         $horario->update($request->all());
@@ -153,9 +105,8 @@ class HorarioController extends Controller
     {
         $horarios = Horario::with(['profesor', 'curso', 'asignatura', 'espacio'])->get();
         
-        $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00'];
-        $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-        
+        $horas = $this->horas;
+        $dias = $this->dias;
         return view('horarios.grilla', compact('horarios', 'horas', 'dias'));
     }
 
@@ -163,11 +114,47 @@ class HorarioController extends Controller
     {
 
         $horarios = Horario::with(['profesor', 'curso', 'asignatura', 'espacio'])->get();
-        $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00'];
-        $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+        $horas = $this->horas;
+        $dias = $this->dias;
 
         $pdf = Pdf::loadView('horarios.pdf', compact('horarios', 'horas', 'dias'));
 
         return $pdf->download('horario_general_timely.pdf');
+    }
+
+    
+    private function validarAforo(Request $request)
+    {
+        $curso = Curso::find($request->curso_id);
+        $espacio = Espacios::find($request->espacio_id);
+
+        if ($espacio && $curso && $espacio->capacidad < $curso->cantidad_estudiantes) {
+            return "¡Error de Aforo! El espacio '{$espacio->nombre}' solo tiene capacidad para {$espacio->capacidad} personas, pero el curso tiene {$curso->cantidad_estudiantes} estudiantes.";
+        }
+        return null;
+    }
+
+    
+    private function validarCruce(Request $request, $ignorarId = null)
+    {
+        $query = Horario::where('dia', $request->dia)
+            ->where(function($q) use ($request) {
+                $q->where('hora_inicio', '<', $request->hora_fin)
+                  ->where('hora_fin', '>', $request->hora_inicio);
+            })
+            ->where(function($q) use ($request) {
+                $q->where('profesor_id', $request->profesor_id)
+                  ->orWhere('espacio_id', $request->espacio_id)
+                  ->orWhere('curso_id', $request->curso_id);
+            });
+
+        if ($ignorarId) {
+            $query->where('id', '!=', $ignorarId);
+        }
+
+        if ($query->exists()) {
+            return '¡Conflicto! Ya existe una clase asignada en este horario para el profesor, curso o espacio seleccionado.';
+        }
+        return null;
     }
 }
