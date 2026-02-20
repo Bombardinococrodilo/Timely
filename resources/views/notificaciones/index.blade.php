@@ -76,7 +76,7 @@
                                     </td>
                                     <td class="text-center">
                                         @if($profe->cursos)
-                                            <span class="badge-director">Director {{ $profe->cursos->grado }}</span>
+                                            <span class="badge badge-director shadow-sm"><i class="fas fa-star me-1"></i> Director {{ $profe->cursos->grado }} - {{ $profe->cursos->grupo }}</span>
                                         @else
                                             <span class="badge-docente">Docente</span>
                                         @endif

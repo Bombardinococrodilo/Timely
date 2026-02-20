@@ -6,7 +6,6 @@
     <style>
         body { font-family: 'Helvetica', sans-serif; font-size: 11px; color: #333; margin: 0; padding: 0; }
         
-        /* CABECERA ESTILO ESMERALDA */
         .header { 
             background-color: #27ae60; 
             color: white; 
@@ -16,7 +15,6 @@
         }
         .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
         
-        /* CAJA DE INFO IGUAL A TUS OTRAS VISTAS */
         .info-box { 
             background: #ecfdf5; 
             padding: 15px; 
@@ -26,7 +24,6 @@
         }
         .info-box strong { color: #166534; }
         
-        /* TABLA ORGANIZADA */
         table { width: 92%; margin: 0 auto; border-collapse: collapse; text-align: center; }
         th, td { border: 1px solid #bbf7d0; padding: 8px; height: 45px; }
         th { background-color: #27ae60; color: white; text-transform: uppercase; font-size: 10px; }
@@ -68,7 +65,7 @@
         </thead>
         <tbody>
             @php
-                // Mantenemos tus bloques de tiempo pero con formato limpio
+            
                 $bloques = [
                     '07:00' => '07:00 - 08:00',
                     '08:00' => '08:00 - 09:00',
@@ -76,7 +73,6 @@
                     '10:30' => '10:30 - 11:30', 
                     '11:30' => '11:30 - 12:30'
                 ];
-                // Corregido 'Miercoles' por 'Miércoles' para coincidir con el header
                 $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
             @endphp
 

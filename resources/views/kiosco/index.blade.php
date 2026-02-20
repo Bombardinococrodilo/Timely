@@ -16,7 +16,6 @@
 
         body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
         
-        /* HEADER ULTRA COMPACTO */
         .kiosco-header { 
             background-color: var(--timely-green);
             color: var(--timely-white); 
@@ -29,7 +28,6 @@
         .logo-path { stroke: var(--timely-white); stroke-width: 4; fill: none; }
         .logo-ring { fill: var(--timely-white); }
 
-        /* ANIMACIÓN DE PASO DE HOJA (4 SEGUNDOS) */
         .carousel-inner { perspective: 2000px; overflow: visible; } 
         .carousel-item {
             backface-visibility: hidden;
@@ -42,7 +40,6 @@
         .carousel-item-next, .carousel-item-prev { opacity: 0; transform: rotateX(110deg); }
         .active { opacity: 1; transform: rotateX(0deg); }
 
-        /* FORMATO CUADERNO */
         .notebook-frame {
             background: var(--timely-white); border-radius: 15px; 
             padding: 35px 15px 10px; position: relative; 
@@ -55,7 +52,6 @@
             background-size: 35px 100%; z-index: 10;
         }
 
-        /* TABLA */
         .table-kiosco th { background-color: var(--timely-green); color: var(--timely-white); padding: 8px; font-size: 0.85rem; border: none; }
         .table-kiosco td { height: 100px; vertical-align: middle; border: 1px solid var(--timely-green-light); }
         .hora-col { background-color: var(--timely-green-light); font-weight: 800; color: var(--timely-green); width: 80px; font-size: 1rem; }
@@ -67,7 +63,6 @@
         .materia-name { font-size: 0.85rem; font-weight: 800; color: var(--timely-green); text-transform: uppercase; display: block; line-height: 1; }
         .materia-sub { font-size: 0.7rem; color: #666; margin-top: 3px; font-weight: 600; line-height: 1.1; }
 
-        /* BOTÓN FLOTANTE */
         .btn-timely { 
             position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; 
             border-radius: 50%; background: var(--timely-green); color: white;
@@ -118,12 +113,31 @@
         @else
             @php
                 $hayDatosReales = $cursosParaCarrusel->count() > 0;
+                
                 $cursosAMostrar = $hayDatosReales ? $cursosParaCarrusel : collect([
-                    (object)['grado' => '10', 'grupo' => 'A'],
-                    (object)['grado' => '11', 'grupo' => 'B']
+                    (object)['grado' => 'EJEMPLO', 'grupo' => '1'],
+                    (object)['grado' => 'EJEMPLO', 'grupo' => '2']
                 ]);
-                $seisHoras = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00'];
-                $ejemplos = [['Matemáticas', '201', 'Pérez'], ['Inglés', 'Lab', 'Smith'], ['Física', '302', 'López'], ['Química', 'Lab 2', 'Torres']];
+
+                $seisHoras = ['07:00', '08:00', '09:00', '10:30', '11:30', '12:30'];
+                $ejemplos = [
+                    // Grilla de Ejemplo 1
+                    [
+                        ['Matemáticas', '201', 'Pérez'], 
+                        ['Inglés', 'Lab Bilingüe', 'Smith'], 
+                        ['Física', '302', 'López'], 
+                        ['Química', 'Lab Quim', 'Torres'],
+                        ['Sociales', '101', 'Gomez']
+                    ],
+                    // Grilla de Ejemplo 2
+                    [
+                        ['Programación', 'Sist 1', 'Calderón'], 
+                        ['Ética', '101', 'Riaño'], 
+                        ['Redes', 'Lab Redes', 'García'], 
+                        ['Emprendimiento', 'Auditorio', 'Pérez'],
+                        ['Deporte', 'Cancha', 'Diaz']
+                    ]
+                ];
             @endphp
 
             <div id="horariosCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="8000">
@@ -132,30 +146,35 @@
                         <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
                             <p class="text-center text-success fw-bold mb-1" style="font-size: 0.9rem;">CURSO: {{ $curso->grado }} - {{ $curso->grupo }}</p>
                             <div class="notebook-frame">
-                                <table class="table table-kiosco table-sm w-100 m-0">
-                                    <thead>
-                                        <tr>
-                                            <th>HORA</th>
-                                            @foreach(['LUN','MAR','MIE','JUE','VIE'] as $d) <th>{{$d}}</th> @endforeach
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($seisHoras as $hIdx => $h)
-                                        <tr>
-                                            <td class="hora-col">{{ $h }}</td>
-                                            @for($i=0; $i<5; $i++)
-                                            <td>
-                                                @php $ex = $ejemplos[($hIdx + $i) % count($ejemplos)]; @endphp
-                                                <div class="clase-card">
-                                                    <span class="materia-name">{{ $ex[0] }}</span>
-                                                    <div class="materia-sub">{{ $ex[1] }} | {{ $ex[2] }}</div>
-                                                </div>
-                                            </td>
-                                            @endfor
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                @if($hayDatosReales)
+                                    @include('kiosco._grilla', ['curso' => $curso])
+                                @else
+                                    @php $ejemploActual = $ejemplos[$index]; @endphp
+                                    <table class="table table-kiosco table-sm w-100 m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>HORA</th>
+                                                @foreach(['LUN','MAR','MIE','JUE','VIE'] as $d) <th>{{$d}}</th> @endforeach
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($seisHoras as $hIdx => $h)
+                                            <tr>
+                                                <td class="hora-col">{{ substr($h, 0, 5) }}</td>
+                                                @for($i=0; $i<5; $i++)
+                                                <td>
+                                                    @php $ex = $ejemploActual[($hIdx + $i) % count($ejemploActual)]; @endphp
+                                                    <div class="clase-card">
+                                                        <span class="materia-name">{{ $ex[0] }}</span>
+                                                        <div class="materia-sub">{{ $ex[1] }} | {{ $ex[2] }}</div>
+                                                    </div>
+                                                </td>
+                                                @endfor
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @endif
                             </div>
                         </div>
                     @endforeach

@@ -6,7 +6,6 @@
     <style>
         body { font-family: 'Helvetica', sans-serif; font-size: 11px; color: #333; margin: 0; padding: 0; }
         
-        /* CABECERA ESTILO ESMERALDA */
         .header { 
             background-color: #27ae60; 
             color: white; 
@@ -16,7 +15,6 @@
         }
         .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
         
-        /* CAJA DE INFO PERSONALIZADA */
         .info-box { 
             background: #ecfdf5; 
             padding: 15px; 
@@ -26,7 +24,6 @@
         }
         .info-box strong { color: #166534; }
         
-        /* TABLA DE HORARIO */
         table { width: 92%; margin: 0 auto; border-collapse: collapse; text-align: center; }
         th, td { border: 1px solid #bbf7d0; padding: 8px; height: 45px; }
         th { background-color: #27ae60; color: white; text-transform: uppercase; font-size: 10px; }
@@ -52,7 +49,6 @@
         <strong>Docente:</strong> {{ $profesor->nombre }} {{ $profesor->apellido }}<br>
         <strong>Especialidad:</strong> {{ $profesor->especialidad ?? 'General' }}<br>
         <strong>Director de Grupo:</strong> 
-        {{-- Validación para el grado del que es director --}}
         {{ $profesor->cursos->grado ?? 'No asignado' }} {{ $profesor->cursos->grupo ?? '' }}
     </div>
 
@@ -69,7 +65,7 @@
         </thead>
         <tbody>
             @php
-                // Bloques de tiempo estándar (Ajusta según tu necesidad)
+
                 $bloques = [
                     '07:00' => '07:00 - 08:00',
                     '08:00' => '08:00 - 09:00',
@@ -87,7 +83,6 @@
                     @foreach($dias as $dia)
                         <td>
                             @php
-                                // Filtramos la clase del profesor por día y hora
                                 $clase = $profesor->horarios->where('dia', $dia)
                                     ->filter(function($h) use ($horaInicio) {
                                         return str_contains($h->hora_inicio, $horaInicio);
