@@ -1,110 +1,100 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Clase</title>
-    <style>
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f8fdf9; }
-        .container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #27ae60; margin-bottom: 30px; }
-        form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .full-width { grid-column: span 2; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; color: #34495e; }
-        select, input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { padding: 12px; background-color: #f39c12; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: block; }
-        .btn:hover { background-color: #e67e22; }
-        .btn-cancel { background-color: #95a5a6; }
-        .alert-error { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; grid-column: span 2; margin-bottom: 20px; border: 1px solid #f5c6cb; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Editar Clase Existente</h1>
+@extends('layouts.app')
 
-        @if ($errors->any())
-            <div class="alert-error">
-                <strong>¡No se pudo actualizar!</strong>
-                <ul style="margin: 0; padding-left: 20px;">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+@section('titulo_pagina', 'Editar Clase')
 
-        <form method="POST" action="{{ route('horarios.update', $horario->id) }}">
-            @csrf
-            @method('PUT') <div>
-                <label>Día de la Semana</label>
-                <select name="dia" required>
-                    <option value="">Seleccione...</option>
-                    @foreach(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'] as $dia)
-                        <option value="{{ $dia }}" {{ $horario->dia == $dia ? 'selected' : '' }}>
-                            {{ $dia }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label>Curso (Grado y Grupo)</label>
-                <select name="curso_id" required>
-                    <option value="">Seleccione...</option>
-                    @foreach($cursos as $curso)
-                        <option value="{{ $curso->id }}" {{ $horario->curso_id == $curso->id ? 'selected' : '' }}>
-                            {{ $curso->nombre_completo }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                
+                <div class="p-3 text-white d-flex align-items-center justify-content-center gap-3" style="background: linear-gradient(135deg, #1e8449, #166534);">
+                    <i class="fas fa-edit fa-lg"></i>
+                    <h5 class="fw-bold mb-0">Actualizar Programación</h5>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ route('horarios.update', $horario->id) }}">
+                        @csrf 
+                        @method('PUT')
 
-            <div>
-                <label>Hora Inicio</label>
-                <input type="time" name="hora_inicio" value="{{ substr($horario->hora_inicio, 0, 5) }}" required>
-            </div>
-            <div>
-                <label>Hora Fin</label>
-                <input type="time" name="hora_fin" value="{{ substr($horario->hora_fin, 0, 5) }}" required>
-            </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label small fw-bold text-muted">Día</label>
+                                <select name="dia" class="form-select border-0 shadow-sm" required style="border-radius: 10px; background-color: #f8fdf9;">
+                                    @foreach(['Lunes','Martes','Miércoles','Jueves','Viernes'] as $d)
+                                        <option value="{{ $d }}" {{ $horario->dia == $d ? 'selected' : '' }}>{{ $d }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label small fw-bold text-muted">Hora Inicio</label>
+                                <input type="time" name="hora_inicio" class="form-control border-0 shadow-sm" value="{{ substr($horario->hora_inicio, 0, 5) }}" required style="border-radius: 10px; background-color: #f8fdf9;">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label small fw-bold text-muted">Hora Fin</label>
+                                <input type="time" name="hora_fin" class="form-control border-0 shadow-sm" value="{{ substr($horario->hora_fin, 0, 5) }}" required style="border-radius: 10px; background-color: #f8fdf9;">
+                            </div>
+                        </div>
 
-            <div>
-                <label>Asignatura</label>
-                <select name="asignatura_id" required>
-                    <option value="">Seleccione...</option>
-                    @foreach($asignaturas as $asignatura)
-                        <option value="{{ $asignatura->id }}" {{ $horario->asignatura_id == $asignatura->id ? 'selected' : '' }}>
-                            {{ $asignatura->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label>Profesor</label>
-                <select name="profesor_id" required>
-                    <option value="">Seleccione...</option>
-                    @foreach($profesores as $profe)
-                        <option value="{{ $profe->id }}" {{ $horario->profesor_id == $profe->id ? 'selected' : '' }}>
-                            {{ $profe->nombre }} {{ $profe->apellido }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-muted">Asignatura</label>
+                                <select name="asignatura_id" class="form-select border-0 shadow-sm" required style="border-radius: 10px; background-color: #f8fdf9;">
+                                    @foreach($asignaturas as $asignatura)
+                                        <option value="{{ $asignatura->id }}" {{ $horario->asignatura_id == $asignatura->id ? 'selected' : '' }}>
+                                            {{ $asignatura->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-muted">Curso</label>
+                                <select name="curso_id" class="form-select border-0 shadow-sm" required style="border-radius: 10px; background-color: #f8fdf9;">
+                                    @foreach($cursos as $curso)
+                                        <option value="{{ $curso->id }}" {{ $horario->curso_id == $curso->id ? 'selected' : '' }}>
+                                            {{ $curso->nombre_completo }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
 
-            <div class="full-width">
-                <label>Ambiente (Salón/Aula)</label>
-                <select name="espacio_id" required>
-                    <option value="">Seleccione...</option>
-                    @foreach($espacios as $espacio)
-                        <option value="{{ $espacio->id }}" {{ $horario->espacio_id == $espacio->id ? 'selected' : '' }}>
-                            {{ $espacio->nombre }} ({{ $espacio->tipo }})
-                        </option>
-                    @endforeach
-                </select>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-muted">Profesor</label>
+                                <select name="profesor_id" class="form-select border-0 shadow-sm" required style="border-radius: 10px; background-color: #f8fdf9;">
+                                    @foreach($profesores as $profe)
+                                        <option value="{{ $profe->id }}" {{ $horario->profesor_id == $profe->id ? 'selected' : '' }}>
+                                            {{ $profe->nombre }} {{ $profe->apellido }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label small fw-bold text-muted">Ambiente (Salón)</label>
+                                <select name="espacio_id" class="form-select border-0 shadow-sm" required style="border-radius: 10px; background-color: #f8fdf9;">
+                                    @foreach($espacios as $espacio)
+                                        <option value="{{ $espacio->id }}" {{ $horario->espacio_id == $espacio->id ? 'selected' : '' }}>
+                                            {{ $espacio->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <a href="{{ route('horarios.index') }}" class="text-muted text-decoration-none fw-bold small">
+                                <i class="fas fa-arrow-left me-1"></i> Volver
+                            </a>
+                            <button type="submit" class="btn px-4 text-white fw-bold shadow-sm" style="background-color: #1e8449; border-radius: 10px;">
+                                Actualizar Clase
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="full-width" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-                <button type="submit" class="btn">Actualizar Clase</button>
-                <a href="{{ route('horarios.index') }}" class="btn btn-cancel">Cancelar</a>
-            </div>
-        </form>
+        </div>
     </div>
-</body>
-</html>
+</div>
+@endsection

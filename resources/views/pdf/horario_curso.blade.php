@@ -2,29 +2,55 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Horario de Curso</title>
+    <title>Horario de Curso - TIMELY</title>
     <style>
-        body { font-family: sans-serif; font-size: 11px; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0056b3; padding-bottom: 10px; }
-        .info-box { background: #e3f2fd; padding: 10px; border: 1px solid #90caf9; margin-bottom: 15px; }
+        body { font-family: 'Helvetica', sans-serif; font-size: 11px; color: #333; margin: 0; padding: 0; }
         
-        table { width: 100%; border-collapse: collapse; text-align: center; }
-        th, td { border: 1px solid #333; padding: 4px; height: 50px; }
-        th { background-color: #0056b3; color: white; }
-        .hora-col { background: #eee; font-weight: bold; width: 60px; }
+        /* CABECERA ESTILO ESMERALDA */
+        .header { 
+            background-color: #27ae60; 
+            color: white; 
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 4px solid #229954; 
+        }
+        .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
         
-        .materia { font-weight: bold; color: #000; display: block; }
-        .profe { color: #555; font-style: italic; font-size: 9px; }
+        /* CAJA DE INFO IGUAL A TUS OTRAS VISTAS */
+        .info-box { 
+            background: #ecfdf5; 
+            padding: 15px; 
+            border-left: 5px solid #27ae60; 
+            margin: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        .info-box strong { color: #166534; }
+        
+        /* TABLA ORGANIZADA */
+        table { width: 92%; margin: 0 auto; border-collapse: collapse; text-align: center; }
+        th, td { border: 1px solid #bbf7d0; padding: 8px; height: 45px; }
+        th { background-color: #27ae60; color: white; text-transform: uppercase; font-size: 10px; }
+        
+        .hora-col { background: #f8fdf9; font-weight: bold; width: 80px; color: #27ae60; border-left: 3px solid #27ae60; }
+        
+        .materia { font-weight: bold; color: #166534; display: block; font-size: 10px; }
+        .profe { color: #666; font-style: italic; font-size: 8.5px; margin-top: 2px; display: block; }
+        
+        .footer { text-align: center; font-size: 9px; color: #999; margin-top: 30px; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>Horario de Clases - Curso {{ $curso->grado }} {{ $curso->grupo }}</h1>
+        <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">Institución Educativa - Año Lectivo {{ date('Y') }}</div>
     </div>
 
     <div class="info-box">
-        <strong>Director de Grupo:</strong> {{ $curso->director->nombre }} {{ $curso->director->apellido }}<br>
+        {{-- CORRECCIÓN DEL ERROR: Usamos el operador ?? para evitar que falle si es null --}}
+        <strong>Director de Grupo:</strong> 
+        {{ $curso->director ? ($curso->director->nombre . ' ' . $curso->director->apellido) : 'No asignado' }}<br>
+        
         <strong>Nivel:</strong> {{ $curso->nivel ?? 'Bachillerato' }}<br>
         <strong>Estudiantes:</strong> {{ $curso->cantidad_estudiantes }}
     </div>
@@ -42,7 +68,7 @@
         </thead>
         <tbody>
             @php
-                // Usa las mismas horas que en tu BD
+                // Mantenemos tus bloques de tiempo pero con formato limpio
                 $bloques = [
                     '07:00' => '07:00 - 08:00',
                     '08:00' => '08:00 - 09:00',
@@ -50,7 +76,8 @@
                     '10:30' => '10:30 - 11:30', 
                     '11:30' => '11:30 - 12:30'
                 ];
-                $dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'];
+                // Corregido 'Miercoles' por 'Miércoles' para coincidir con el header
+                $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
             @endphp
 
             @foreach($bloques as $horaInicio => $etiqueta)
@@ -60,17 +87,14 @@
                     @foreach($dias as $dia)
                         <td>
                             @php
-                                // Buscamos la clase para este curso, día y hora
                                 $clase = $curso->horarios->first(function($h) use ($dia, $horaInicio) {
                                     return $h->dia === $dia && str_contains($h->hora_inicio, $horaInicio);
                                 });
                             @endphp
 
                             @if($clase)
-                                <div>
-                                    <span class="materia">{{ $clase->asignatura->nombre ?? 'Sin Asignatura' }}</span><br>
-                                    <span class="profe">Prof. {{ $clase->profesor->apellido ?? 'Asignado' }}</span>
-                                </div>
+                                <span class="materia">{{ $clase->asignatura->nombre ?? 'Sin Asignatura' }}</span>
+                                <span class="profe">Prof. {{ $clase->profesor->apellido ?? 'Asignado' }}</span>
                             @endif
                         </td>
                     @endforeach
@@ -78,6 +102,10 @@
             @endforeach
         </tbody>
     </table>
+
+    <div class="footer">
+        Documento generado digitalmente por el sistema <strong>TIMELY</strong>.
+    </div>
 
 </body>
 </html>

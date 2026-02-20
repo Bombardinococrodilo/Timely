@@ -1,159 +1,101 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Asignaturas</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fdf9;
-            color: #2c3e50;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 8px 24px rgba(39, 174, 96, 0.08);
-            padding: 40px 30px 30px 30px;
-        }
-        h1 {
-            text-align: center;
-            color: #27ae60;
-            margin-bottom: 30px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: white;
-            color: #27ae60;
-            font-weight: bold;
-            border-radius: 30px;
-            text-decoration: none;
-            margin: 5px 8px 15px 0;
-            transition: 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .btn:hover {
-            background-color: #27ae60;
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            background: #ecfdf5;
-            margin-bottom: 12px;
-            padding: 18px 22px;
-            border-radius: 12px;
-            color: #166534;
-            font-size: 1.08rem;
-            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.05);
-        }
-        .success {
-            color: #27ae60;
-            text-align: center;
-            margin-bottom: 18px;
-            font-weight: bold;
-        }
-        footer {
-            text-align: center;
-            padding: 15px;
-            background-color: #2ecc71;
-            color: white;
-            font-size: 0.9rem;
-            margin-top: 40px;
-            border-radius: 0 0 18px 18px;   
-        }
-        li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-edit {
-            display: inline-block;
-            padding: 8px 15px;
-            background-color: #f0fdf4;
-            color: #16a34a;
-            font-size: 0.9rem;
-            font-weight: bold;
-            border-radius: 20px;
-            text-decoration: none;
-            transition: 0.3s ease;
-            border: 1px solid #bbf7d0;
-        }
-        .btn-edit:hover {
-            background-color: #16a34a;
-            color: white;
-        }
-              
-        .actions {
-            display: flex;
-            gap: 8px; 
-        }
-        .btn-delete {
-            display: inline-block;
-            padding: 8px 15px;
-            background-color: #fef2f2;
-            color: #dc2626;
-            font-size: 0.9rem;
-            font-weight: bold;
-            border-radius: 20px;
-            text-decoration: none;
-            transition: 0.3s ease;
-            border: 1px solid #fecaca;
-            cursor: pointer;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .btn-delete:hover {
-            background-color: #dc2626;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Asignaturas Registradas</h1>
-        <a href="{{ route('asignaturas.create') }}" class="btn">Nueva Asignatura</a>
-        <a href="{{ url('') }}" class="btn">Volver</a>
+@extends('layouts.app')
 
-        @if(session('success'))
-            <p class="success">{{ session('success') }}</p>
-        @endif
+@section('titulo_pagina', 'Gestión de Asignaturas')
 
-        <ul>
-            @forelse($asignaturas as $asignatura)
-                <li>
-                    <div>
-                        {{ $asignatura->nombre }} / {{ $asignatura->tipo_materia }}
-                        <br>
-                        <small style="color: #555;">Descripción: {{ $asignatura->descripcion }}</small>
-                        <br>
-                        <small style="color: #555;">Docente a cargo: {{ $asignatura->profesor_asignado }}</small>
-                        <br>
-                        <small style="color: #555;">Horas Semanales: {{ $asignatura->horas_semanales }}</small>
-                    </div>
-                    <div class="actions">
-                        <a href="{{ route('asignaturas.edit', $asignatura->id) }}" class="btn-edit">Editar</a>
-                        <form action="{{ route('asignaturas.destroy', $asignatura->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta asignatura $asignatura?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-delete">Eliminar</button>  
-                        </form>
-                    </div>
-                </li>
-            @empty
-                <li>No hay asignaturas registradas.</li>
-            @endforelse
-        </ul>
+@section('content')
+<style>
+    .card-notebook {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        position: relative;
+        margin-top: 15px;
+        border-top: 4px solid var(--timely-medium);
+        transition: 0.2s;
+    }
+    .card-notebook:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+    .notebook-rings {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .ring-simple {
+        width: 8px;
+        height: 18px;
+        background: #d1d5db;
+        border-radius: 4px;
+    }
+
+    .card-body-simple { padding: 25px 15px 15px 15px; }
+
+    .btn-circle {
+        width: 32px; height: 32px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    .badge-type { font-size: 0.7rem; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; }
+</style>
+
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0" style="color: var(--timely-dark);">Asignaturas</h3>
+        <a href="{{ route('asignaturas.create') }}" class="btn text-white px-4 shadow-sm" style="background-color: var(--timely-medium); border-radius: 20px;">
+            <i class="fas fa-plus small me-2"></i> Nueva Materia
+        </a>
     </div>
-    <footer>
-        <div>© 2025 Timely. Todos los derechos reservados.</div>
-    </footer>
-</body>
-</html>
+
+    @if(session('success'))
+        <div class="alert alert-success border-0 small py-2 mb-4" style="background-color: #f0fdf4; color: #166534;">
+            <i class="fas fa-check me-2"></i> {{ session('success') }}
+        </div>
+    @endif
+
+    <div class="row">
+        @forelse($asignaturas as $asignatura)
+            <div class="col-md-4 mb-4">
+                <div class="card-notebook">
+                    <div class="notebook-rings">
+                        <div class="ring-simple"></div>
+                        <div class="ring-simple"></div>
+                        <div class="ring-simple"></div>
+                    </div>
+
+                    <div class="card-body-simple">
+                        <div class="mb-2">
+                            <span class="badge-type {{ $asignatura->tipo_materia == 'técnica' ? 'bg-warning-subtle text-warning' : 'bg-success-subtle text-success' }}">
+                                {{ $asignatura->tipo_materia }}
+                            </span>
+                        </div>
+                        <h6 class="fw-bold mb-1">{{ $asignatura->nombre }}</h6>
+                        <p class="text-muted small mb-2 text-truncate">{{ $asignatura->descripcion }}</p>
+                        
+                        <div class="small mb-3">
+                            <i class="fas fa-user-tie me-1 text-secondary"></i> {{ $asignatura->profesor_asignado }}<br>
+                            <i class="fas fa-clock me-1 text-secondary"></i> {{ $asignatura->horas_semanales }}h semanales
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-1 border-top pt-2">
+                            <a href="{{ route('asignaturas.edit', $asignatura->id) }}" class="btn btn-light btn-circle text-success shadow-sm">
+                                <i class="fas fa-edit fa-xs"></i>
+                            </a>
+                            <form action="{{ route('asignaturas.destroy', $asignatura->id) }}" method="POST" onsubmit="return confirm('¿Eliminar asignatura?');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-light btn-circle text-danger shadow-sm">
+                                    <i class="fas fa-trash fa-xs"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No hay asignaturas registradas.</p>
+            </div>
+        @endforelse
+    </div>
+</div>
+@endsection

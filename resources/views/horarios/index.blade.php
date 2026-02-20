@@ -1,79 +1,70 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Horarios</title>
-    <style>
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f8fdf9; color: #2c3e50; }
-        .container { max-width: 1100px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #27ae60; }
-        .btn { padding: 10px 20px; text-decoration: none; border-radius: 20px; font-weight: bold; color: white; display: inline-block; }
-        .btn-new { background-color: #27ae60; }
-        .btn-home { background-color: #7f8c8d; margin-left: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #2ecc71; color: white; }
-        tr:hover { background-color: #f1f1f1; }
-        .actions { display: flex; gap: 5px; }
-        .btn-sm { padding: 5px 10px; font-size: 0.8rem; border: none; cursor: pointer; border-radius: 5px; }
-        .btn-edit { background-color: #f39c12; color: white; }
-        .btn-delete { background-color: #e74c3c; color: white; }
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; background-color: #e8f5e9; color: #27ae60; border: 1px solid #c8e6c9; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Horarios Académicos</h1>
-        <div style="margin-bottom: 20px;">
-            <a href="{{ route('horarios.create') }}" class="btn btn-new">+ Programar Clase</a>
-            <a href="{{ url('/') }}" class="btn btn-home">Volver al Inicio</a>
+@extends('layouts.app')
+
+@section('titulo_pagina', 'Gestión de Horarios')
+
+@section('content')
+<style>
+    .card-notebook {
+        border: 1px solid #e0e0e0; border-radius: 8px; background: white;
+        position: relative; margin-top: 15px; border-top: 4px solid #1e8449;
+    }
+    .notebook-rings { position: absolute; top: -10px; left: 20px; display: flex; gap: 15px; }
+    .ring-simple { width: 8px; height: 18px; background: #d1d5db; border-radius: 4px; }
+    .card-body-simple { padding: 25px 15px 15px 15px; }
+    .btn-circle { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+    .badge-day { background-color: #e8f5e9; color: #1b5e20; font-weight: bold; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; }
+</style>
+
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0" style="color: var(--timely-dark);">Cronograma de Clases</h3>
+            <p class="text-muted small">Listado detallado de la programación académica</p>
         </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('horarios.grilla') }}" class="btn btn-outline-success px-3 shadow-sm" style="border-radius: 20px;">
+                <i class="fas fa-calendar-alt me-1"></i> Ver Grilla
+            </a>
+            <a href="{{ route('horarios.create') }}" class="btn text-white px-4 shadow-sm" style="background-color: var(--timely-medium); border-radius: 20px;">
+                <i class="fas fa-plus small me-2"></i> Programar Clase
+            </a>
+        </div>
+    </div>
 
-        @if(session('success'))
-            <div style="background:#d4edda; color:#155724; padding:10px; border-radius:5px; margin-bottom:15px;">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Día / Hora</th>
-                    <th>Curso</th>
-                    <th>Asignatura</th>
-                    <th>Profesor</th>
-                    <th>Ambiente</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($horarios as $h)
-                <tr>
-                    <td>
-                        <strong>{{ $h->dia }}</strong><br>
-                        {{ substr($h->hora_inicio, 0, 5) }} - {{ substr($h->hora_fin, 0, 5) }}
-                    </td>
-                    <td><span class="badge">{{ $h->curso->nombre_completo ?? 'N/A' }}</span></td>
-                    <td>{{ $h->asignatura->nombre ?? 'N/A' }}</td>
-                    <td>{{ $h->profesor->nombre ?? 'N/A' }} {{ $h->profesor->apellido ?? '' }}</td>
-                    <td>{{ $h->ambiente->nombre ?? 'N/A' }}</td>
-                    <td>
-                        <div class="actions">
-                            <a href="{{ route('horarios.edit', $h->id) }}" class="btn-sm btn-edit">Editar</a>
+    <div class="row">
+        @forelse($horarios as $h)
+            <div class="col-md-4 mb-4">
+                <div class="card-notebook shadow-sm">
+                    <div class="notebook-rings">
+                        <div class="ring-simple"></div><div class="ring-simple"></div><div class="ring-simple"></div>
+                    </div>
+                    <div class="card-body-simple">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge-day">{{ $h->dia }}</span>
+                            <small class="text-muted fw-bold"><i class="far fa-clock"></i> {{ substr($h->hora_inicio, 0, 5) }} - {{ substr($h->hora_fin, 0, 5) }}</small>
+                        </div>
+                        <h6 class="fw-bold mb-1 text-primary">{{ $h->asignatura->nombre ?? 'N/A' }}</h6>
+                        <div class="small mb-3">
+                            <div class="mb-1"><i class="fas fa-users me-2 text-secondary"></i><strong>Curso:</strong> {{ $h->curso->nombre_completo ?? 'N/A' }}</div>
+                            <div class="mb-1"><i class="fas fa-user-tie me-2 text-secondary"></i><strong>Prof:</strong> {{ $h->profesor->nombre ?? 'N/A' }}</div>
+                            <div><i class="fas fa-map-marker-alt me-2 text-secondary"></i><strong>Aula:</strong> {{ $h->ambiente->nombre ?? 'N/A' }}</div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-1 border-top pt-2">
+                            <a href="{{ route('horarios.edit', $h->id) }}" class="btn btn-light btn-circle text-success shadow-sm"><i class="fas fa-edit fa-xs"></i></a>
                             <form action="{{ route('horarios.destroy', $h->id) }}" method="POST" onsubmit="return confirm('¿Borrar esta clase?');">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn-sm btn-delete">X</button>
+                                <button type="submit" class="btn btn-light btn-circle text-danger shadow-sm"><i class="fas fa-trash fa-xs"></i></button>
                             </form>
                         </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" style="text-align:center;">No hay clases programadas aún.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-light mb-3"></i>
+                <p class="text-muted">No hay clases programadas.</p>
+            </div>
+        @endforelse
     </div>
-</body>
-</html>
+</div>
+@endsection

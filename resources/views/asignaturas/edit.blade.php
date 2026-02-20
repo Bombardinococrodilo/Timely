@@ -1,65 +1,64 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Asignaturas</title>
-    <style>
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fdf9; color: #2c3e50; }
-        .container { max-width: 900px; margin: 40px auto; background: white; border-radius: 18px; box-shadow: 0 8px 24px rgba(39, 174, 96, 0.08); padding: 40px; }
-        h1 { text-align: center; color: #27ae60; margin-bottom: 30px; }
-        .btn { display: inline-block; padding: 12px 25px; background-color: white; color: #27ae60; font-weight: bold; border-radius: 30px; text-decoration: none; margin: 10px 8px 0 0; transition: 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #ddd; }
-        .btn:hover { background-color: #27ae60; color: white; transform: translateY(-3px); box-shadow: 0 6px 10px rgba(0,0,0,0.15); }
-        .btn-primary { background-color: #27ae60; color: white; border: none; }
-        .btn-primary:hover { background-color: #229954; }
-        form { display: flex; flex-direction: column; gap: 20px; }
-        label { font-weight: bold; color: #34495e; }
-        input[type="text"], input[type="descripcion"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .actions { margin-top: 20px; }
-        footer { text-align: center; padding: 20px; color: #7f8c8d; font-size: 0.9rem; margin-top: 40px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Editar Información de las Asignaturas</h1>
+@extends('layouts.app')
 
-        <form method="POST" action="{{ route('asignaturas.update', $asignatura->id) }}">
-            @csrf @method('PUT') <div>
-                <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" value="{{ $asignatura->nombre }}" required>
-            </div>
+@section('titulo_pagina', 'Editar Asignatura')
 
-            <div>
-                <label for="horas_semanales">Horas Semanales:</label>
-                <input type="text" id="horas_semanales" name="horas_semanales" value="{{ $asignatura->horas_semanales }}" required>
-            </div>
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                
+                <div class="p-3 text-white d-flex align-items-center justify-content-center gap-3" style="background: linear-gradient(135deg, #1e8449, #166534);">
+                    <i class="fas fa-edit fa-lg"></i>
+                    <h5 class="fw-bold mb-0">Editar Asignatura</h5>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ route('asignaturas.update', $asignatura->id) }}">
+                        @csrf 
+                        @method('PUT')
 
-            <div>
-                <label for="descripcion">Descripción:</label>
-                <input type="text" id="descripcion" name="descripcion" value="{{ $asignatura->descripcion }}" required>
-            </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Nombre de la Materia</label>
+                            <input type="text" name="nombre" class="form-control border-0 shadow-sm" value="{{ $asignatura->nombre }}" required style="background-color: #f8fdf9; border-radius: 10px; padding: 10px;">
+                        </div>
 
-            <div>
-                <label for="profesor_asignado">Docente a cargo:</label>
-                <input type="text" id="profesor_asignado" name="profesor_asignado" value="{{ $asignatura->profesor_asignado }}" required>
-            </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Descripción</label>
+                            <input type="text" name="descripcion" class="form-control border-0 shadow-sm" value="{{ $asignatura->descripcion }}" required style="background-color: #f8fdf9; border-radius: 10px; padding: 10px;">
+                        </div>
 
-            <div>
-                <label for="tipo_materia">Tipo de Materia:</label>
-                <select id="tipo_materia" name="tipo_materia" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box;">
-                    <option value="curricular" {{ $asignatura->tipo_materia == 'curricular' ? 'selected' : '' }}>Curricular</option>
-                    <option value="técnica" {{ $asignatura->tipo_materia == 'técnica' ? 'selected' : '' }}>Técnica</option>
-                </select>
-            </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-muted">Docente a cargo</label>
+                                <input type="text" name="profesor_asignado" class="form-control border-0 shadow-sm" value="{{ $asignatura->profesor_asignado }}" required style="background-color: #f8fdf9; border-radius: 10px; padding: 10px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold text-muted">Horas Semanales</label>
+                                <input type="number" name="horas_semanales" class="form-control border-0 shadow-sm" value="{{ $asignatura->horas_semanales }}" required style="background-color: #f8fdf9; border-radius: 10px; padding: 10px;">
+                            </div>
+                        </div>
 
-            <div class="actions">
-                <button type="submit" class="btn btn-primary">Actualizar Asignatura</button>
-                <a href="{{ route('asignaturas.index') }}" class="btn">Cancelar</a>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted">Tipo de Materia</label>
+                            <select name="tipo_materia" class="form-select border-0 shadow-sm" style="background-color: #f8fdf9; border-radius: 10px; padding: 10px;">
+                                <option value="curricular" {{ $asignatura->tipo_materia == 'curricular' ? 'selected' : '' }}>Curricular</option>
+                                <option value="técnica" {{ $asignatura->tipo_materia == 'técnica' ? 'selected' : '' }}>Técnica</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <a href="{{ route('asignaturas.index') }}" class="text-muted text-decoration-none fw-bold small">
+                                <i class="fas fa-arrow-left me-1"></i> Volver
+                            </a>
+                            <button type="submit" class="btn px-4 text-white fw-bold shadow-sm" style="background-color: #1e8449; border-radius: 10px;">
+                                Actualizar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
-    <footer>
-        <div>© 2025 Timely. Todos los derechos reservados.</div>
-    </footer>
-</body>
-</html>
+</div>
+@endsection

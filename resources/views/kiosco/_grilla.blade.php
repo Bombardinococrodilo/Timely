@@ -1,41 +1,37 @@
-<div class="table-responsive bg-white p-3 rounded-4 shadow-sm">
-    <table class="table table-bordered table-kiosco w-100">
-        <thead>
+<table class="table table-kiosco w-100 m-0 border-0">
+    <thead>
+        <tr>
+            <th>HORA</th>
+            @foreach($dias as $dia)
+                <th>{{ $dia }}</th>
+            @endforeach
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($horas as $hora)
             <tr>
-                <th><i class="fas fa-clock"></i> Hora</th>
+                <td class="hora-col">{{ substr($hora, 0, 5) }}</td>
                 @foreach($dias as $dia)
-                    <th>{{ $dia }}</th>
+                    @php
+                        $clase = $curso->horarios->first(function($h) use ($dia, $hora) {
+                            return $h->dia == $dia && substr($h->hora_inicio, 0, 5) == substr($hora, 0, 5);
+                        });
+                    @endphp
+                    <td>
+                        @if($clase)
+                            <div class="clase-card">
+                                <span class="materia-name">{{ $clase->asignatura->nombre ?? 'Materia' }}</span>
+                                <div class="materia-sub text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> {{ $clase->espacio->nombre ?? '---' }}<br>
+                                    <i class="fas fa-user-tie"></i> {{ $clase->profesor->apellido ?? '---' }}
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-muted opacity-25">---</div>
+                        @endif
+                    </td>
                 @endforeach
             </tr>
-        </thead>
-        <tbody>
-            @foreach($horas as $hora)
-                <tr>
-                    <td class="hora-col">{{ $hora }}</td>
-                    
-                    @foreach($dias as $dia)
-                        @php
-                            $clase = $curso->horarios->first(function($h) use ($dia, $hora) {
-                                return $h->dia == $dia && substr($h->hora_inicio, 0, 5) == $hora;
-                            });
-                        @endphp
-
-                        <td>
-                            @if($clase)
-                                <div class="clase-card">
-                                    <span class="materia-text">{{ $clase->asignatura->nombre ?? 'Asignatura' }}</span>
-                                    <span class="salon-text">
-                                        <i class="fas fa-map-marker-alt text-danger"></i> {{ $clase->espacio->nombre ?? 'Aula' }}<br>
-                                        <i class="fas fa-user text-primary mt-1"></i> Prof. {{ $clase->profesor->apellido ?? 'Asignado' }}
-                                    </span>
-                                </div>
-                            @else
-                                <span class="text-muted opacity-50">-</span>
-                            @endif
-                        </td>
-                    @endforeach
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
+        @endforeach
+    </tbody>
+</table>

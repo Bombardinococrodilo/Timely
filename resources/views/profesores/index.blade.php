@@ -1,155 +1,110 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Profesores</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fdf9;
-            color: #2c3e50;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 8px 24px rgba(39, 174, 96, 0.08);
-            padding: 40px 30px 30px 30px;
-        }
-        h1 {
-            text-align: center;
-            color: #27ae60;
-            margin-bottom: 30px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: white;
-            color: #27ae60;
-            font-weight: bold;
-            border-radius: 30px;
-            text-decoration: none;
-            margin: 5px 8px 15px 0;
-            transition: 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .btn:hover {
-            background-color: #27ae60;
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            background: #ecfdf5;
-            margin-bottom: 12px;
-            padding: 18px 22px;
-            border-radius: 12px;
-            color: #166534;
-            font-size: 1.08rem;
-            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.05);
-        }
-        .success {
-            color: #27ae60;
-            text-align: center;
-            margin-bottom: 18px;
-            font-weight: bold;
-        }
-        footer {
-            text-align: center;
-            padding: 15px;
-            background-color: #2ecc71;
-            color: white;
-            font-size: 0.9rem;
-            margin-top: 40px;
-            border-radius: 0 0 18px 18px;   
-        }
-        li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-edit {
-            display: inline-block;
-            padding: 8px 15px;
-            background-color: #f0fdf4;
-            color: #16a34a;
-            font-size: 0.9rem;
-            font-weight: bold;
-            border-radius: 20px;
-            text-decoration: none;
-            transition: 0.3s ease;
-            border: 1px solid #bbf7d0;
-        }
-        .btn-edit:hover {
-            background-color: #16a34a;
-            color: white;
-        }
-              
-        .actions {
-            display: flex;
-            gap: 8px; 
-        }
-        .btn-delete {
-            display: inline-block;
-            padding: 8px 15px;
-            background-color: #fef2f2;
-            color: #dc2626;
-            font-size: 0.9rem;
-            font-weight: bold;
-            border-radius: 20px;
-            text-decoration: none;
-            transition: 0.3s ease;
-            border: 1px solid #fecaca;
-            cursor: pointer;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .btn-delete:hover {
-            background-color: #dc2626;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Profesores Registrados</h1>
-        <a href="{{ route('profesores.create') }}" class="btn">Nuevo Profesor</a>
-        <a href="{{ url('') }}" class="btn">Volver</a>
+@extends('layouts.app')
 
-        @if(session('success'))
-            <p class="success">{{ session('success') }}</p>
-        @endif
+@section('titulo_pagina', 'Gestión de Docentes')
 
-        <ul>
-            @forelse($profesores as $profesor)
-                <li>
-                    <div>
-                        {{ $profesor->nombre }} {{ $profesor->apellido }} 
-                        <br>
-                        <small style="color: #555;">Especialidad: {{ $profesor->especialidad ?? 'No definida' }}</small>
-                    </div>
-                    <div class="actions">
-                        <a href="{{ route('profesores.edit', $profesor->id) }}" class="btn-edit">Editar</a>
-                        <form action="{{ route('profesores.destroy', $profesor->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a este profesor?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-delete">Eliminar</button>
-                        </form>
-                    </div>
-                </li>
-            @empty
-                <li>No hay profesores registrados.</li>
-            @endforelse
-        </ul>
+@section('content')
+<style>
+    /* Tarjeta tipo Hoja de Libreta */
+    .card-notebook {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        position: relative;
+        margin-top: 15px;
+        border-top: 4px solid var(--timely-medium); /* Franja de color Timely */
+        transition: 0.2s;
+    }
+    
+    .card-notebook:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+    /* Anillos simplificados (solo 3 por tarjeta) */
+    .notebook-rings {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .ring-simple {
+        width: 8px;
+        height: 18px;
+        background: #d1d5db; /* Gris neutro */
+        border-radius: 4px;
+    }
+
+    .card-body-simple {
+        padding: 25px 15px 15px 15px;
+    }
+
+    .btn-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+</style>
+
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0" style="color: var(--timely-dark);">Profesores</h3>
+        <a href="{{ route('profesores.create') }}" class="btn text-white px-4 shadow-sm" style="background-color: var(--timely-medium); border-radius: 20px;">
+            <i class="fas fa-plus small me-2"></i> Nuevo
+        </a>
     </div>
-    <footer>
-        <div>© 2025 Timely. Todos los derechos reservados.</div>
-    </footer>
-</body>
-</html>
+
+    @if(session('success'))
+        <div class="alert alert-success border-0 small py-2 mb-4" style="background-color: #f0fdf4; color: #166534;">
+            <i class="fas fa-check me-2"></i> {{ session('success') }}
+        </div>
+    @endif
+
+    <div class="row">
+        @forelse($profesores as $profesor)
+            <div class="col-md-4 mb-4">
+                <div class="card-notebook">
+                    <div class="notebook-rings">
+                        <div class="ring-simple"></div>
+                        <div class="ring-simple"></div>
+                        <div class="ring-simple"></div>
+                    </div>
+
+                    <div class="card-body-simple">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; color: var(--timely-medium);">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0">{{ $profesor->nombre }} {{ $profesor->apellido }}</h6>
+                                <small class="text-muted">{{ $profesor->especialidad ?? 'Docente' }}</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center border-top pt-2">
+                            <small class="text-muted" style="font-size: 0.75rem;">{{ $profesor->email }}</small>
+                            <div class="d-flex gap-1">
+                                <a href="{{ route('profesores.edit', $profesor->id) }}" class="btn btn-light btn-circle text-success shadow-sm">
+                                    <i class="fas fa-edit fa-xs"></i>
+                                </a>
+                                <form action="{{ route('profesores.destroy', $profesor->id) }}" method="POST" onsubmit="return confirm('¿Eliminar?');">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-light btn-circle text-danger shadow-sm">
+                                        <i class="fas fa-trash fa-xs"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Lista vacía.</p>
+            </div>
+        @endforelse
+    </div>
+</div>
+@endsection
